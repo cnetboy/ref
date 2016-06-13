@@ -32,3 +32,6 @@ An alternative to cssh was created because it had a tendency to close sessions o
 
 I included a sample output from the integration code in /samples/debug.log. This is basically so that you know what the output will be like. This is also what Mu needs to plot. I also included the /samples/history.txt which is a dump of the bash history. It should give you an idea of what I was doing to run the experiment (and test things earlier on).
 
+#Publications
+To be updated
+
