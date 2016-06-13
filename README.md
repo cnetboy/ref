@@ -18,7 +18,11 @@ A modification of a the ryu (http://osrg.github.io/ryu/) simple learning switch 
 
 #Scootplayer
 
-An unmodified version of Scootplayer was used. This can be found here. Ask Mu for the dataset. I'll see if we still have the various MPDs, but they are easy to create and modify.
+An experimental MPEG-DASH request engine with support for accurate logging. This is used on the clients for the QoE usecase.
+
+#Patch Controller
+
+This is a simple bridge SDN controller that rate-limits on a per port basis. This is only used when the target OpenFlow hardware does not support metering on muliple tables within a single pipeline.
 
 #Tools
 
