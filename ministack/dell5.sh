@@ -1,0 +1,1 @@
+export OS_TENANT_NAME=admin OS_USERNAME=admin OS_PASSWORD=admin OS_AUTH_URL=http://10.30.65.205:35357/v2.0
