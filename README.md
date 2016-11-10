@@ -2,14 +2,13 @@
 
 Online video streaming and Internet of Things (IoT) are becoming the main consumers of future networks, generating high throughput and highly dynamic traffic from large numbers of heterogeneous user devices. This places significant pressure on the underlying networks and deteriorates performance, efficiency and fairness. In order to address this issue, future networks must incorporate contextual network designs that recognize application and user-level requirements. However, new designs of network management components such as resource provisioning models are often tested within simulation environments which lack subtleties in how network protocols and relevant specifications are executed by network equipment in practice. This paper contributes the design and operational guidelines for an software-defined networking (SDN) experimentation framework (REF), which enables rapid evaluation of contextual networking designs using real network infrastructures. A use case study of a QoE-aware resource allocation model demonstrates the effectiveness of REF in facilitating design and validation of SDN-assisted networking.
 
-##Utility model (UFair usecase)
 
-This is glues together the various elements. It includes both my integration code and Mu's QoE code, and can be found in the /UFair folder. The code to run is the /UFair/integration.py script. This will do the talking between the OpenFlow controller, Mu's QoE code and the REF framework. Try python integration.py -h to check out the parameters you can pass. To install the required packages, run pip install -r requirements.txt; that should install everything.
+##Getting started
+TODO
 
-I've also included the config file used in the experiments (/UFair/config.json). It's basically a tree structure, describing the nodes (hosts, servers and switches) and the connections between them (the edges). The config is fairly self explanatory, but is rather tedious to build.
 
-The /UFair/integration.py code has been documented pretty well, so it should be relatively easy to modify it for new Utility models.
-
+##Rest interface
+TODO
 
 ##OpenFlow Bandwidth (OpenFlow controller)
 
@@ -34,7 +33,16 @@ An alternative to cssh was created because it had a tendency to close sessions o
 
 ##Samples
 
-I included a sample output from the integration code in /samples/debug.log. This is basically so that you know what the output will be like. This is also what Mu needs to plot. I also included the /samples/history.txt which is a dump of the bash history. It should give you an idea of what I was doing to run the experiment (and test things earlier on).
+I included a sample output from the integration code in /samples/debug.log. This is basically so that you know what the output will be like. This data can then be transformed and plotted. The /samples/history.txt file is a dump of the bash history, it shows as an example on how to run the experiment.
+
+##Utility model (UFair. Example usecase)
+
+This glues together the various elements. It includes both my integration code and Mu's QoE code, and can be found in the /UFair folder. The code to run is the /UFair/integration.py script. This will do the talking between the OpenFlow controller, Mu's QoE code and the REF framework. Try python integration.py -h to check out the parameters you can pass. To install the required packages, run pip install -r requirements.txt; that should install everything.
+
+The configuration file used in the experiments (/UFair/config.json) is a tree structure, describing the nodes (hosts, servers and switches) and the connections between them (the edges). The config is fairly self explanatory, but is rather tedious to build.
+
+The /UFair/integration.py code has been documented pretty well, so it should be relatively easy to modify it for new Utility models.
+
 
 ##Publications
 To be updated
