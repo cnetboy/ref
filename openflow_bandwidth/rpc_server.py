@@ -77,6 +77,15 @@ class RequestHandler(pyjsonrpc.HttpRequestHandler):
 
 
 	@pyjsonrpc.rpcmethod
+	def report_flows(self, switch):
+		'''
+		This returns the current flows in the network (The OSI level is 
+		determined by the forwarding application)
+		'''
+		return self.server.get_current_flows(switch.encode('ascii'))
+
+
+	@pyjsonrpc.rpcmethod
 	def report_meters(self, switch):
 		result = self.server.report_meters(switch.encode('ascii'))
 		return result

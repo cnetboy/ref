@@ -465,6 +465,9 @@ class SimpleSwitch13(app_manager.RyuApp):
 
 
 
+    def get_flow_stats(self):
+	return flow_stats
+
     #handle flow stats replies
     @set_ev_cls(ofp_event.EventOFPFlowStatsReply, MAIN_DISPATCHER)
     def flow_stats_reply_handler(self, ev):
@@ -477,11 +480,13 @@ class SimpleSwitch13(app_manager.RyuApp):
                     unpacked[cookie] = TimedFlowStatRecord (statsEntry.packet_count, statsEntry.byte_count, statsEntry.match, statsEntry.table_id, statsEntry.priority, statsEntry.duration_sec, statsEntry.duration_nsec )
             return unpacked
 
+	print ev.msg.body
         flowStats = _unpack(ev.msg.body)
+	print "Flow stats:"
+	print flowStats
+	self.flow_stats = flowStats
 
-        # *** Unfinished stub - the returned flow stats should probably be saved in some global/persistent store.
-        # *** Unfinished because the HP switches were observed not to return byte conters for any of the flows.
-
+	#TODO unpack flow stats properly
 
     #handle port stats replies
     @set_ev_cls(ofp_event.EventOFPPortStatsReply, MAIN_DISPATCHER)
