@@ -100,19 +100,19 @@ class SimpleSwitch13(app_manager.RyuApp):
 
 	
 	#flow mod for table miss :packetin to contoller if unrecognised by switch
-	self.add_flow(datapath, 1, match, actions)
+	self.add_flow(datapath, 1, match, actions, table_num=0)
 	
 	#no lldp
-	self.add_flow(datapath, 1, parser.OFPMatch(eth_type=0x88cc), [])
+	#self.add_flow(datapath, 1, parser.OFPMatch(eth_type=0x88cc), [])
 
         #self.add_flow(datapath, 1, parser.OFPMatch(eth_dst="ff:ff:ff:ff:ff:ff"),[parser.OFPActionOutput(ofproto.OFPP_FLOOD,0)])        
 
         #Add new switches for polling
         self.datapathdict[datapath.id]=datapath
 
+	print 'Switch found'
 
-
-    def add_flow(self, datapath, priority, match, actions, buffer_id=None, meters=[], timeout=0, cookie=0, table_num=100):
+    def add_flow(self, datapath, priority, match, actions, buffer_id=None, meters=[], timeout=0, cookie=0, table_num=0):
         '''Add a flow to a datapath - modified to allow meters'''
 	ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
@@ -130,7 +130,7 @@ class SimpleSwitch13(app_manager.RyuApp):
 
 
 	for meter in meters:
-            # print "Sending flow mod with meter instruction, meter :", meter
+            print "Sending flow mod with meter instruction, meter :", meter
 	    if meter == -1:
 	        inst.append(parser.OFPInstructionGotoTable(200))
 	    #elif meter<50:
@@ -194,6 +194,11 @@ class SimpleSwitch13(app_manager.RyuApp):
 	port_to_meter[int(port_no)]=int(port_no)
 
         return 1
+
+
+    def blacklist_source(self, datapath_id, src_addr):
+	self.add_flow(datapath, 1, parser.OFPMatch(eth_type=0x800, ipv4_src=src_addr), [])
+
 
     def add_meter_service(self, datapath_id, src_addr, dst_addrs, speed):
         '''Adds meters to a datapath. The meter is between a single src to many dsts. speed argument is in kbps'''
@@ -312,7 +317,7 @@ class SimpleSwitch13(app_manager.RyuApp):
 	# print('DPID', dpid)
         self.mac_to_port.setdefault(dpid, {})
 	self.ip_to_port.setdefault(dpid, {})
-	#self.logger.info("%s", self.datapathdict)
+	self.logger.info("%s", self.datapathdict)
  	if dst != "ff:ff:ff:ff:ff:ff":
        	      #self.logger.info("packet in %s %s %s %s", self._dp_name(dpid), src, dst, in_port)
 
@@ -380,6 +385,7 @@ class SimpleSwitch13(app_manager.RyuApp):
         if out_port != ofproto.OFPP_FLOOD and dst != "ff:ff:ff:ff:ff:ff":
 	    match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
             # verify if we have a valid buffer_id, if yes avoid to send both
+            print "Flooding"
             # flow_mod & packet_out
             if msg.buffer_id != ofproto.OFP_NO_BUFFER:
                 self.add_flow(datapath, 2, match, actions, msg.buffer_id, meters=[out_port], timeout=60)
@@ -393,6 +399,9 @@ class SimpleSwitch13(app_manager.RyuApp):
         out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,
                                   in_port=in_port, actions=actions, data=data)
         datapath.send_msg(out)
+
+    def report_meter_stats(datapath_id):
+	return self.METER_CURRENT[datapath_id] 
 
 
     #handle meter stats replies

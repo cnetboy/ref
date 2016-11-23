@@ -69,6 +69,18 @@ class RequestHandler(pyjsonrpc.HttpRequestHandler):
 	def enforce_port_outbound(self, switch, port, speed):
 		self.server.add_meter_port(switch.encode('ascii'), int(port), int(speed))
 
+
+
+	@pyjsonrpc.rpcmethod
+	def blacklist_source(self, switch, src):
+		self.server.blacklist_source(switch.encode('ascii'), src)
+
+
+	@pyjsonrpc.rpcmethod
+	def report_meters(self, switch):
+		result = self.server.report_meters(switch.encode('ascii'))
+		return result
+
 	@pyjsonrpc.rpcmethod
 	def enforce_service(self, switch, src, dsts, speed):
 		try:
