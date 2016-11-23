@@ -11,7 +11,7 @@ The controller runs a JSON-RPC server for interfacing. Procedures shown below.
 
 <b> Open vSwitch </b>
 <br>Bandwidth reporting - Confirmed
-<br>Bandwidht enforcing - Failed
+<br>Bandwidth enforcing - Failed
 
 ## Quick start
 Install Ryu - simple pip installation has requirements
