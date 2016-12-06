@@ -46,7 +46,7 @@ class SimpleSwitch13(app_manager.RyuApp):
 
         #init polling thread
         switchPoll = SwitchPoll()
-        pollThread = Thread(target=switchPoll.run, args=(3,self.datapathdict))
+        pollThread = Thread(target=switchPoll.run, args=(0.5,self.datapathdict))
         pollThread.start()
         # print "Created polling threads"
 
@@ -57,7 +57,7 @@ class SimpleSwitch13(app_manager.RyuApp):
         self.METER_MAX = {}
         self.METER_RATE = {}
 
-        Thread(target=rpc_server().run, args=(1,(self.PORT_RATE,self.PORT_MAX,self.METER_RATE,self.METER_MAX), self.add_meter_port,self.add_meter_service)).start()
+        Thread(target=rpc_server().run, args=(1,(self.PORT_RATE,self.PORT_MAX,self.METER_RATE,self.METER_MAX), self.add_meter_port,self.add_meter_service, self.get_current_flows)).start()
 
         #Map for sw to meters to ports
         self.datapathID_to_meters = {}
@@ -110,7 +110,7 @@ class SimpleSwitch13(app_manager.RyuApp):
         #Add new switches for polling
         self.datapathdict[datapath.id]=datapath
 
-	print 'Switch found'
+	print 'Switch found ' + str(datapath.id)
 
     def add_flow(self, datapath, priority, match, actions, buffer_id=None, meters=[], timeout=0, cookie=0, table_num=0):
         '''Add a flow to a datapath - modified to allow meters'''
@@ -195,14 +195,17 @@ class SimpleSwitch13(app_manager.RyuApp):
 
         return 1
 
+    def get_current_flows(self, switch):
+	'''Retrieve all flows within the flow table of the switch'''
+	return self.get_flow_stats()
 
     def blacklist_source(self, datapath_id, src_addr):
-	self.add_flow(datapath, 1, parser.OFPMatch(eth_type=0x800, ipv4_src=src_addr), [])
+	self.add_flow(datapath, 0, parser.OFPMatch(eth_type=0x800, ipv4_src=src_addr), [])
 
 
     def add_meter_service(self, datapath_id, src_addr, dst_addrs, speed):
         '''Adds meters to a datapath. The meter is between a single src to many dsts. speed argument is in kbps'''
-	#print "ADDING METER FOR SERVICE from " + str(src_addr) + " to "+ str(dst_addrs) + " at " + str(speed) + "Kbps on dp " + self._dp_name(datapath_id)
+	print "ADDING METER FOR SERVICE from " + str(src_addr) + " to "+ str(dst_addrs) + " at " + str(speed) + "Kbps on dp " + self._dp_name(datapath_id)
         datapath_id=int(datapath_id)
 	if datapath_id not in self.datapathdict:
             print "### Error: datapath_id not in self.datapathdict"
@@ -260,7 +263,9 @@ class SimpleSwitch13(app_manager.RyuApp):
 	for dst_addr in dst_addrs:
 		print dst_addr        	
 		match = parser.OFPMatch(eth_type=0x800, ipv4_src=src_addr, ipv4_dst=dst_addr)
-        	actions = [parser.OFPActionOutput(ofproto.OFPP_NORMAL)]
+		#OFPP_NORMAL is not supported by all switches
+		#TODO CHANGE THIS DEPENDING ON SWITCH!
+        	actions = [parser.OFPActionOutput(ofproto.OFPP_FLOOD)]
 		#actions = []
         	cookie = 0x7fffffff & crc32(str(datapath)+src_addr+dst_addr)
         	# print "cookie: %s" % hex(cookie)
@@ -268,7 +273,7 @@ class SimpleSwitch13(app_manager.RyuApp):
 #		if dst_addr in self.ip_to_port[datapath_id]:
 #			self.add_flow(datapath, 100, match, actions, buffer_id=None, meters=[meter_id,self.ip_to_port[datapath_id][dst_addr]], timeout=0, cookie=cookie)
 #		else:
-		self.add_flow(datapath, 101, match, actions, buffer_id=None, meters=[meter_id], timeout=0, cookie=cookie)
+		self.add_flow(datapath, 100, match, actions, buffer_id=None, meters=[meter_id], timeout=0, cookie=cookie)
 #			print "Warning ",dst_addr," not in   : ",self.ip_to_port[datapath_id]
         self.datapathID_to_meter_ID[datapath_id]=meter_id+1
 
@@ -312,6 +317,8 @@ class SimpleSwitch13(app_manager.RyuApp):
 
         dst = eth.dst
         src = eth.src
+
+	ip_src=None
         
 	dpid = datapath.id
 	# print('DPID', dpid)
@@ -383,7 +390,13 @@ class SimpleSwitch13(app_manager.RyuApp):
 
         # install a flow to avoid packet_in next time
         if out_port != ofproto.OFPP_FLOOD and dst != "ff:ff:ff:ff:ff:ff":
-	    match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
+	    # match on full packet in for more information
+	    #match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
+	    if(ip_src):
+	    	match = parser.OFPMatch(eth_type=eth.ethertype, ipv4_src=ip_src, ipv4_dst=ip_dst, in_port=in_port, eth_dst=dst, eth_src=src)
+	    else:
+		match = parser.OFPMatch(in_port=in_port, eth_dst=dst, eth_src=src)
+		
             # verify if we have a valid buffer_id, if yes avoid to send both
             print "Flooding"
             # flow_mod & packet_out
@@ -466,27 +479,25 @@ class SimpleSwitch13(app_manager.RyuApp):
 
 
     def get_flow_stats(self):
-	return flow_stats
+	return self.flow_stats
 
     #handle flow stats replies
     @set_ev_cls(ofp_event.EventOFPFlowStatsReply, MAIN_DISPATCHER)
     def flow_stats_reply_handler(self, ev):
 
-        def _unpack(flowStats):
-            unpacked = {}
-            for statsEntry in flowStats:
-                cookie = statsEntry.cookie
-                if cookie != 0: # we only will collect statistics which we have marked with a cookie...
-                    unpacked[cookie] = TimedFlowStatRecord (statsEntry.packet_count, statsEntry.byte_count, statsEntry.match, statsEntry.table_id, statsEntry.priority, statsEntry.duration_sec, statsEntry.duration_nsec )
+        def _unpack(package):
+            unpacked = []
+            for statsEntry in package:
+		#print statsEntry
+                unpacked.append({"packet_count":statsEntry.packet_count, "byte_count":statsEntry.byte_count, "match":statsEntry.match.to_jsondict(), "table":statsEntry.table_id, "priority":statsEntry.priority, "duration":statsEntry.duration_sec, "nduration":statsEntry.duration_nsec})
             return unpacked
-
-	print ev.msg.body
+	
         flowStats = _unpack(ev.msg.body)
-	print "Flow stats:"
-	print flowStats
+
+
+
 	self.flow_stats = flowStats
 
-	#TODO unpack flow stats properly
 
     #handle port stats replies
     @set_ev_cls(ofp_event.EventOFPPortStatsReply, MAIN_DISPATCHER)
@@ -559,12 +570,12 @@ class SimpleSwitch13(app_manager.RyuApp):
 
 
 	    # visualise the stats in the server side
-            print "##############"
-	    print self._dp_name(ev.msg.datapath.id)
-	    print "Port - current"
-            pprint(rate_debug)
-            print "Port - maximum"
-            pprint(maxStats_debug)
+            #print "##############"
+	    #print self._dp_name(ev.msg.datapath.id)
+	    #print "Port - current"
+            #pprint(rate_debug)
+            #print "Port - maximum"
+            #pprint(maxStats_debug)
 
 
 

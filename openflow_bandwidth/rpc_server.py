@@ -11,10 +11,11 @@ class rpc_server:
 	def terminate(self):
 		self._running = False
 
-	def run(self, num, (port_rate,port_max,flow_rate,flow_max), add_meter_port, add_meter_service):
+	def run(self, num, (port_rate,port_max,flow_rate,flow_max), add_meter_port, add_meter_service, get_current_flows):
 		http_server = pyjsonrpc.ThreadingHttpServer(server_address = ('localhost', 4000),RequestHandlerClass = RequestHandler)
 		http_server.add_meter_port = add_meter_port
 		http_server.add_meter_service = add_meter_service
+		http_server.get_current_flows = get_current_flows
 		http_server.port_rate = port_rate
 		http_server.port_max = port_max
 		http_server.flow_rate = flow_rate
@@ -82,8 +83,8 @@ class RequestHandler(pyjsonrpc.HttpRequestHandler):
 		This returns the current flows in the network (The OSI level is 
 		determined by the forwarding application)
 		'''
-		return self.server.get_current_flows(switch.encode('ascii'))
-
+		result = self.server.get_current_flows(switch.encode('ascii'))
+		return result
 
 	@pyjsonrpc.rpcmethod
 	def report_meters(self, switch):
