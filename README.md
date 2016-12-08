@@ -1,10 +1,10 @@
-#REF
+#Rapid Experimentation Framework (REF)
 
 Online video streaming and Internet of Things (IoT) are becoming the main consumers of future networks, generating high throughput and highly dynamic traffic from large numbers of heterogeneous user devices. This places significant pressure on the underlying networks and deteriorates performance, efficiency and fairness. In order to address this issue, future networks must incorporate contextual network designs that recognize application and user-level requirements. However, new designs of network management components such as resource provisioning models are often tested within simulation environments which lack subtleties in how network protocols and relevant specifications are executed by network equipment in practice. This paper contributes the design and operational guidelines for an software-defined networking (SDN) experimentation framework (REF), which enables rapid evaluation of contextual networking designs using real network infrastructures. A use case study of a QoE-aware resource allocation model demonstrates the effectiveness of REF in facilitating design and validation of SDN-assisted networking.
 
 
 ##Getting started
-
+In order to get started using REF, a few dependencies are required. Infrastructure control, client automation, and the REF controller
 
 ###Infrastructure
 Using MiniStack with OpenStack to automate VM creation and environment cleanup at scale.
@@ -19,6 +19,8 @@ https://github.com/lyndon160/REF/tree/master/cluster_command
 
 TODO
 
+###REF controller
+
 ###Creating your first application
 TODO
 
@@ -31,6 +33,10 @@ Run bandwidth_control_simple_switch_13.py as a Ryu app
 `% ryu-manager bandwidth_control_simple_switch_13.py`
 
 By default the RPC server is running on `http://localhost:4000/jsonrpc`
+
+
+
+
 
 ## JSON RPC interface
 The JSON-RPC server is a HTTP server.
