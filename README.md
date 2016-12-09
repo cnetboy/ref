@@ -48,7 +48,7 @@ Assuming the dependencies are correctly installed, you can run the controller wi
 
 `% ryu-manager bandwidth_control_simple_switch_13.py`
 
-###Creating and running your first application
+###Creating and running your first REF application
 
 Copy the sample skeleteon program provided in this repository under samples (samples/skeleton.py).
 
