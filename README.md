@@ -16,13 +16,32 @@ Install python and pip using your package manager.
 
 `% sudo pip install -r requirements.txt`
 
-###Infrastructure
+###Infrastructure (Virtualised) - Advanced solution
 Using MiniStack with OpenStack to automate VM creation and environment cleanup at scale.
 
-TODO add installation details for infrastucture.
+Need some help getting openstack together? Checkout our single command openstack build scripts: https://github.com/hdb3/openstack-build 
 
 Visit the readme here for usage instructions:
 https://github.com/lyndon160/REF/tree/master/ministack
+
+After openstack is setup (with vlan configurations), connect it to your OpenFlow 1.3 compliant switches. Also, if not already configured, configure the switches to point to the controller (the IP that REF is running on).
+
+
+
+###Infrastructure (Containers) - Basic solution
+With this solution, you will be limited scale because of the limited throughput avialable with compliant soft switches (CPqD).
+This solution uses Mininet to bring up and destroy clients at scale.
+
+Clone mininet
+
+`$ git clone https://github.com/mininet/mininet`
+
+Build mininet with the CPqD soft switch
+
+`$ sudo ./install.sh -n3fxw`
+
+
+In order to use this you must use the CPqD switch because as of yet, OvS does not support the extended features used in this framework.
 
 
 ###Client automation
