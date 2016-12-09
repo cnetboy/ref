@@ -4,18 +4,34 @@ Online video streaming and Internet of Things (IoT) are becoming the main consum
 
 
 ##Getting started
-In order to get started using REF, a few dependencies are required. Infrastructure control, client automation, and the REF controller
+In order to get started using REF, a few dependencies are required. Infrastructure control, client automation, and the REF controller. It is recommended that you all of the tools and packages provided in this repository as they have been frozen for this REF's use. Newer versions of other tools may offer more features but we cannot guarantee that they will work.
+
+Install python and pip using your package manager.
+
+`% sudo apt-get install python`
+
+`% sudo apt-get install python-pip`
+
+ Install all pip requirements using the requirements.txt file provided (this includes the ryu controller):
+
+`% sudo pip install -r requirements.txt`
 
 ###Infrastructure
 Using MiniStack with OpenStack to automate VM creation and environment cleanup at scale.
-Visit the readme here:
+
+TODO add installation details for infrastucture.
+
+Visit the readme here for usage instructions:
 https://github.com/lyndon160/REF/tree/master/ministack
 
 
 ###Client automation
 Use cluster command to automate your clients across the network.
-Visit the readme here:
-https://github.com/lyndon160/REF/tree/master/cluster_command
+
+TODO add installation details for this
+
+Visit the readme here for further usage details:
+https://github.com/lyndon160/REF/tree/master/cluster_command/
 
 TODO
 
