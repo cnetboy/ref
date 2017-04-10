@@ -4,7 +4,7 @@ Online video streaming and Internet of Things (IoT) are becoming the main consum
 
 ![REF Architecture](https://raw.githubusercontent.com/lyndon160/REF/master/ref-arch.png)
 
-##Getting started
+## Getting started
 In order to get started using REF, a few dependencies are required. Infrastructure control, client automation, and the REF controller. It is recommended that you all of the tools and packages provided in this repository as they have been frozen for this REF's use. Newer versions of other tools may offer more features but we cannot guarantee that they will work.
 
 Install python and pip using your package manager.
@@ -17,7 +17,7 @@ Install python and pip using your package manager.
 
 `% sudo pip install -r requirements.txt`
 
-###Infrastructure (Virtualised) - Advanced solution
+### Infrastructure (Virtualised) - Advanced solution
 Using MiniStack with OpenStack to automate VM creation and environment cleanup at scale.
 
 Need some help getting openstack together? Checkout our single command openstack build scripts: https://github.com/hdb3/openstack-build 
@@ -29,7 +29,7 @@ After openstack is setup (with vlan configurations), connect it to your OpenFlow
 
 
 
-###Infrastructure (Containers) - Basic solution
+### Infrastructure (Containers) - Basic solution
 With this solution, you will be limited scale because of the limited throughput avialable with compliant soft switches (CPqD).
 This solution uses Mininet to bring up and destroy clients at scale.
 
@@ -45,7 +45,7 @@ Build mininet with the CPqD soft switch
 In order to use this you must use the CPqD switch because as of yet, OvS does not support the extended features used in this framework.
 
 
-###Client automation
+### Client automation
 Use cluster command to automate your clients across the network.
 
 TODO add installation details for this
@@ -55,7 +55,7 @@ https://github.com/lyndon160/REF/tree/master/cluster_command/
 
 TODO
 
-###REF controller
+### REF controller
 The REF controller is a modified version of the Ryu controller (http://osrg.github.io/ryu/) , it can be found in the /openflow_bandwidth folder. The applciation supports the basic forwarding applications available in Ryu and offers control of the network through an RPC intereface. It reports context in the network by monitoring all flows, meters and ports, it also keeps a track of the maximum throughput seen on the switch and on any single flow, port, or meter. The controller runs a JSON-RPC server for interfacing (see below for API). 
 
 Install depedencies. Python, Python-pip, and the Ryu controller.
@@ -68,7 +68,7 @@ Assuming the dependencies are correctly installed, you can run the controller wi
 
 `% ryu-manager bandwidth_control_simple_switch_13.py`
 
-###Creating and running your first REF application
+### Creating and running your first REF application
 
 Copy the sample skeleteon program provided in this repository under samples (samples/skeleton.py).
 
@@ -271,15 +271,15 @@ Show specifc port on a switch
 
 `% python block flow.py <switch_id> <src_ip> <dst_ip> <duration seconds>`
 
-##Scootplayer (Tool for usecase)
+## Scootplayer (Tool for usecase)
 
 An experimental MPEG-DASH request engine with support for accurate logging. This is used on the clients for the QoE usecase.
 
-##Patch Controller
+## Patch Controller
 
 This is a simple bridge SDN controller that rate-limits on a per port basis. This is only used when the target OpenFlow hardware does not support metering on muliple tables within a single pipeline.
 
-##Tools
+## Tools
 
 There is a number of additional scripts I used in the experimentation. For example, the /tools/reboot.sh script is used to reboot all the nodes via the nova interface. It could be used again (assuming we naming the hosts and servers the same). This naming shouldn't be an issue if we use the /tools/specmuall.py script in conjunction with Nic's ministack tools. This will recreate the exact same configuration of VMs and networks that we used in the experiment. The only think missing is the configuration of the HP switches and the VLAN trickery used to ensure VMs appear on particular ports on each of the virtual switches present on the physical HP switch.
 
@@ -287,21 +287,21 @@ There is two bash scripts used during the experiments. These were run simultaneo
 
 An alternative to cssh was created because it had a tendency to close sessions or fail to open some. The experiments can be ran using cluster command simple RPC program which contains scripts specific to this experiment. The server is already installed and running on the clients. (Included in the REF repository as /cluster_command)
 
-##Samples
+## Samples
 
 I included a sample output from the integration code in /samples/debug.log. This is basically so that you know what the output will be like. This data can then be transformed and plotted. The /samples/history.txt file is a dump of the bash history, it shows as an example on how to run the experiment.
 
-##Utility model 1 (UFair. Example usecase 1)
+## Utility model 1 (UFair. Example usecase 1)
 
 This glues together the various elements. It includes both my integration code and Mu's QoE code, and can be found in the /UFair folder. The code to run is the /UFair/integration.py script. This will do the talking between the OpenFlow controller, Mu's QoE code and the REF framework. Try python integration.py -h to check out the parameters you can pass. To install the required packages, run pip install -r requirements.txt; that should install everything.
 
 The configuration file used in the experiments (/UFair/config.json) is a tree structure, describing the nodes (hosts, servers and switches) and the connections between them (the edges). The config is fairly self explanatory, but is rather tedious to build.
 
-##Utility model 2 (Smart-ACL. Example usecase 2)
+## Utility model 2 (Smart-ACL. Example usecase 2)
 This uses the REF framework to get information about the throughput of all current flows in the network. Then using a whitelist, it determines how much bandwidth each node in the network should be delegated. Further more, it uses infromations about meters from REF including the drop rate to determine whether an attack is taking place, with this information it can decide if it wants to block the flow or not. This is highly dependant on the amount of available bandwidth.
 https://github.com/lyndon160/Smart-ACL
 
-##Publications
+## Publications
 UFair paper published available to be read.
 Smart-ACL currently in submission.
 REF paper currently in submission.
